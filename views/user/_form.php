@@ -18,6 +18,7 @@ use yii\widgets\ActiveForm;
         $isUpdate = ($from == 'update_user');
         $isGuest = Yii::$app->User->isGuest;
         $isAdmin = ((!$isGuest)&&(Yii::$app->User->identity->user_type == 0));
+        
     ?>
     
     <?php if(!$isUpdate && $isAdmin){ ?>
@@ -26,7 +27,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'student_no')->textInput(['maxlength' => 10, 'readonly' => $isUpdate]) ?>
 
-    <?php if(!$isUpdate){ ?>
+    <?php if(!$isUpdate || (!$isGuest && !$isAdmin)){ ?>
         <?= $form->field($model, 'username')->textInput(['maxlength' => 30]) ?>
     
         <?= $form->field($model, 'password')->passwordInput(['maxlength' => 800]) ?>

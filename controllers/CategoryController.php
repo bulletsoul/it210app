@@ -32,12 +32,17 @@ class CategoryController extends Controller
      */
     public function actionIndex()
     {
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+        
         $dataProvider = new ActiveDataProvider([
             'query' => Category::find(),
         ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin
         ]);
     }
 

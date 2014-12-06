@@ -73,11 +73,22 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
+        $success = false;
+        
         $model = new User();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->user_id]);
-        } else {
+        
+        if ($model->load(Yii::$app->request->post())){            
+            
+            $model->password = md5($model->password);
+        
+            if($model->save()){
+                $success = true;
+            }
+        }   
+        
+        if($success){
+            return $this->redirect(['index']);
+        } else {            
             return $this->render('create', [
                 'model' => $model,
             ]);
@@ -92,15 +103,30 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->user_id]);
+        $success = false;
+        
+        $model = $this->findModel($id); 
+        
+        $oldPassword = $model->password;
+        
+        if ($model->load(Yii::$app->request->post())){            
+            
+            if($model->password!=$oldPassword){
+                $model->password = md5($model->password);
+            }
+        
+            if($model->save()){
+                $success = true;
+            }
+        }   
+        
+        if($success){
+            return $this->redirect(['view', 'student_no' => $model->student_no]);
         } else {
             return $this->render('update', [
                 'model' => $model,
             ]);
-        }
+        }   
     }
 
     /**

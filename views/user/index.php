@@ -25,9 +25,16 @@ if(!$isGuest || $isAdmin){
             'dataProvider' => $dataProvider,
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
+                [
+                 'attribute' => 'student_no',
+                 'format' => 'raw',
+                 'value' => function ($model, $key, $index) { 
+                    return Html::a($model->student_no, ['view', 'id' => $model->user_id]);
+                 },
+                ],
     
                 //'user_type',
-                'student_no',
+               // 'student_no',
                 //'username',
                 //'password',
                 'lname',

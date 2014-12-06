@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -26,7 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'description',
             'title',
             'category_id',
-
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
