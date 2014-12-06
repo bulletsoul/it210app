@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Requirement;
+use app\models\Category;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -32,12 +33,24 @@ class RequirementController extends Controller
      */
     public function actionIndex()
     {
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+        $query = '';
+        
+        if(!$isGuest){
+            $query = $isAdmin ?
+                Requirement::find()://->where(['user_type' => 1]) :
+                Requirement::find()->where(['user_id' => Yii::$app->User->identity->user_id]);
+        }
+        
         $dataProvider = new ActiveDataProvider([
-            'query' => Requirement::find(),
+            'query' => $query,
         ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin            
         ]);
     }
 
