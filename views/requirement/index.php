@@ -1,8 +1,9 @@
 <?php
 
+use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\grid\GridView;
+//use yii\grid\GridView;
 use yii\web\ForbiddenHttpException;
 use app\models\Category;
 
@@ -20,6 +21,7 @@ if(!$isGuest || $isAdmin){
             <?= Html::a('Create Requirement', ['create'], ['class' => 'btn btn-success']) ?>
         </p>
     
+       
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
@@ -30,10 +32,12 @@ if(!$isGuest || $isAdmin){
                 'description',
                 //'category_id',
                 [
-                 'attribute' => 'category_desc',
-                 'value' => function ($model) { 
-                    return $model->findCategory($model->category_id)->description;
+                 'attribute' => 'category',
+                 'value' => function ($model) {
+                    $val = $model->findCategory($model->category_id)->description;
+                    return $val;
                  },
+                 'enableSorting' => true
                 ],
                 ['class' => 'yii\grid\ActionColumn'],
             ],

@@ -4,10 +4,11 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Grade;
-use yii\data\ActiveDataProvider;
+use app\models\GradeSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * GradeController implements the CRUD actions for Grade model.
@@ -32,11 +33,56 @@ class GradeController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Grade::find(),
-        ]);
+        $searchModel = new GradeSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        // validate if there is a editable input saved via AJAX
+        if (Yii::$app->request->post('hasEditable')) {
+            // Create PHP value from stored representation of 'editableKey' 
+            $keys = unserialize(Yii::$app->request->post('editableKey'));
+            // Return model record with the requirement_id and student_no of the row being edited
+            $model = $this->findModel($keys['requirement_id'], $keys['student_no']);
+            
+            // store a default json response as desired by editable
+            $out = Json::encode(['output'=>'', 'message'=>'']);
+            
+            // fetch the first entry in posted data (there should 
+            // only be one entry anyway in this array for an 
+            // editable submission)
+            // - $posted is the posted data for Book without any indexes
+            // - $post is the converted array for single model validation
+            $post = [];
+            $posted = current($_POST['Grade']);
+     
+            // 
+            if ($model->requirement_id) {
+                $model->grade = $posted['grade'];
+                // can save model or do something before saving model
+                $model->save();
+     
+                // custom output to return to be displayed as the editable grid cell
+                // data. Normally this is empty - whereby whatever value is edited by 
+                // in the input by user is updated automatically.
+                $output = '';
+     
+                // specific use case where you need to validate a specific
+                // editable column posted when you have more than one 
+                // EditableColumn in the grid view. We evaluate here a 
+                // check to see if grade was posted for the Grade model
+                if (isset($posted['grade'])) {
+                   $output =  Yii::$app->formatter->asDecimal($model->grade, 2);
+                }
+                
+                $out = Json::encode(['output'=>$output, 'message'=>'']);
+            }
+            
+            // return ajax json encoded response and exit
+            echo $out;
+            return;
+        }
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }

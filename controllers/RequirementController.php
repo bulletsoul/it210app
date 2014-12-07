@@ -37,6 +37,7 @@ class RequirementController extends Controller
         $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
         $query = '';
         
+        // Edit this! 
         if(!$isGuest){
             $query = $isAdmin ?
                 Requirement::find()://->where(['user_type' => 1]) :
@@ -44,7 +45,7 @@ class RequirementController extends Controller
         }
         
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => Requirement::find(),
         ]);
 
         return $this->render('index', [
