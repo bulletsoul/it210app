@@ -6,12 +6,16 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Grade;
+use app\models\Requirement;
+use app\models\User;
 
 /**
  * GradeSearch represents the model behind the search form about `app\models\Grade`.
  */
 class GradeSearch extends Grade
 {
+    public $requirement;
+    public $student_name;
     /**
      * @inheritdoc
      */
@@ -19,8 +23,8 @@ class GradeSearch extends Grade
     {
         return [
             [['requirement_id'], 'integer'],
-            [['student_no'], 'safe'],
-            [['grade'], 'number'],
+            [['student_no','student_name','requirement'], 'safe'],
+            [['grade'], 'number']
         ];
     }
 
@@ -44,20 +48,33 @@ class GradeSearch extends Grade
     {
         $query = Grade::find();
 
+        $query->joinWith(['requirement','studentNo']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+        
+        // Important: here is how we set up the sorting
+        // The key is the attribute name on our "TourSearch" instance
+        $dataProvider->sort->attributes['requirement'] = [
+            // The tables are the ones our relation are configured to
+            'asc' => ['requirement.title' => SORT_ASC],
+            'desc' => ['requirement.title' => SORT_DESC],
+        ];
+        
+        $dataProvider->sort->attributes['student_name'] = [
+            'asc' => ['user.lname' => SORT_ASC],
+            'desc' => ['user.lname' => SORT_DESC],
+        ];
 
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
 
         $query->andFilterWhere([
-            'requirement_id' => $this->requirement_id,
+            'requirement.requirement_id' => $this->requirement_id,
+            'user.student_no' => $this->student_no,
             'grade' => $this->grade,
         ]);
-
-        $query->andFilterWhere(['like', 'student_no', $this->student_no]);
 
         return $dataProvider;
     }

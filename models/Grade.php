@@ -46,6 +46,8 @@ class Grade extends \yii\db\ActiveRecord
             'requirement_id' => 'Requirement ID',
             'student_no' => 'Student Number',
             'grade' => 'Grade',
+            'requirement' => 'Requirement',
+            'student_name' => 'Student Name'
         ];
     }
 
@@ -65,10 +67,22 @@ class Grade extends \yii\db\ActiveRecord
         return $this->hasOne(Requirement::className(), ['requirement_id' => 'requirement_id']);
     }
     
-    // Retrieves category description of the passed category_id
-    public static function findRequirementDescription($requirement_id)
+    /* Getter for country name */
+    public function getRequirementTitle() {
+        return $this->requirement->title;
+    }
+    
+    // Retrieves requirement associated to the passed category_id
+    public static function findRequirement($requirement_id)
     {
         $model = Requirement::find()->where(['requirement_id' => $requirement_id])->one();
+        return $model;
+    }
+    
+    // Retrieves category description of the passed category_id
+    public static function findStudentName($student_no)
+    {
+        $model = User::find()->where(['student_no' => $student_no])->one();
         return $model;
     }
 }

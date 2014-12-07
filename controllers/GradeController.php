@@ -37,18 +37,26 @@ class GradeController extends Controller
         $model = new Grade();
         $searchModel = new GradeSearch();
         $from_req_page = false;
-        $req = '';
+        $req = '';      
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+        $query = '';               
         
         // Get request parameters        
         $qryParams = Yii::$app->request->queryParams;
+        
         // Check parameters if request came from requirements page
         // There are two parameters if from req'ts page, otherwise, just 1
         if(count($qryParams) > 1 && array_key_exists('id', $qryParams)){
-            $query = $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id']]]);
-            $req = $model->findRequirementDescription($qryParams['id'])->title;
+            $query = $isAdmin ?
+                $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id']]]) :
+                $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id'], 'student_no' => Yii::$app->User->identity->student_no]]);
+            $req = $model->findRequirement($qryParams['id']);
             $from_req_page = true;   
-        } else 
-            $query = $searchModel->search($qryParams);
+        } else {
+            $query = $isAdmin ? $searchModel->search($qryParams) :
+                $searchModel->search(['GradeSearch' => ['student_no' => Yii::$app->User->identity->student_no]]);;
+        }
             
         $dataProvider = $query;
         

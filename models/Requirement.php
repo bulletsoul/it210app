@@ -33,7 +33,8 @@ class Requirement extends \yii\db\ActiveRecord
         return [
             [['description', 'title', 'category_id'], 'required'],
             [['title', 'category_id'], 'string', 'max' => 200],
-            [['description'], 'string', 'max' => 800]
+            [['description'], 'string', 'max' => 800],
+            [['perfect_grade'], 'number'],
         ];
     }
 
@@ -47,6 +48,7 @@ class Requirement extends \yii\db\ActiveRecord
             'description' => 'Description/Instruction',
             'title' => 'Title',
             'category_id' => 'Category ID',
+            'perfect_grade' => 'Perfect Grade',
         ];
     }
 
