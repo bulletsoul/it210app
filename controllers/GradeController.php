@@ -33,8 +33,24 @@ class GradeController extends Controller
      */
     public function actionIndex()
     {
+        // Variables
+        $model = new Grade();
         $searchModel = new GradeSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $from_req_page = false;
+        $req = '';
+        
+        // Get request parameters        
+        $qryParams = Yii::$app->request->queryParams;
+        // Check parameters if request came from requirements page
+        // There are two parameters if from req'ts page, otherwise, just 1
+        if(count($qryParams) > 1 && array_key_exists('id', $qryParams)){
+            $query = $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id']]]);
+            $req = $model->findRequirementDescription($qryParams['id'])->title;
+            $from_req_page = true;   
+        } else 
+            $query = $searchModel->search($qryParams);
+            
+        $dataProvider = $query;
         
         // validate if there is a editable input saved via AJAX
         if (Yii::$app->request->post('hasEditable')) {
@@ -84,6 +100,8 @@ class GradeController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'from_req_page' => $from_req_page,
+            'req' => $req
         ]);
     }
 

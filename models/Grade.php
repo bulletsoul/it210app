@@ -64,4 +64,11 @@ class Grade extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Requirement::className(), ['requirement_id' => 'requirement_id']);
     }
+    
+    // Retrieves category description of the passed category_id
+    public static function findRequirementDescription($requirement_id)
+    {
+        $model = Requirement::find()->where(['requirement_id' => $requirement_id])->one();
+        return $model;
+    }
 }

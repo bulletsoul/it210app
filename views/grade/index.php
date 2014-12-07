@@ -10,7 +10,8 @@ use yii\bootstrap\BootstrapAsset;
 /* @var $searchModel app\models\GradeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Grades';
+$this->title = $from_req_page ? 'Grades for '.$req : 'Grades';
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="grade-index">
@@ -41,7 +42,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format'=>['decimal', 2],
                 'pageSummary' => true
             ],
-            'requirement_id',
+            //'requirement_id',
+            [
+                'attribute' => 'Requirement',
+                'value' => function ($model) {
+                    $val = $model->findRequirementDescription($model->requirement_id)->title;
+                    return $val;
+                }
+            ],
             'student_no',
         ];
     // end of grid columns definition

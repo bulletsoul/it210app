@@ -66,7 +66,7 @@ class Requirement extends \yii\db\ActiveRecord
         return $this->hasOne(Category::className(), ['category_id' => 'category_id']);
     }
     
-    
+    // Retrieves category description of the passed category_id
     public static function findCategory($category_id)
     {
         $model = Category::find()->where(['category_id' => $category_id])->one();

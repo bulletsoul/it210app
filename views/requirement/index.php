@@ -28,7 +28,14 @@ if(!$isGuest || $isAdmin){
                 ['class' => 'yii\grid\SerialColumn'],
     
                 //'requirement_id',
-                'title',
+                //'title',
+                [
+                 'attribute' => 'title',
+                 'format' => 'raw',
+                 'value' => function ($model, $key, $index) { 
+                    return Html::a($model->title, ['/grade/index', 'id' => $model->requirement_id]);
+                 },
+                ],
                 'description',
                 //'category_id',
                 [
@@ -36,8 +43,7 @@ if(!$isGuest || $isAdmin){
                  'value' => function ($model) {
                     $val = $model->findCategory($model->category_id)->description;
                     return $val;
-                 },
-                 'enableSorting' => true
+                 }
                 ],
                 ['class' => 'yii\grid\ActionColumn'],
             ],
