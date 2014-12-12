@@ -44,20 +44,24 @@ class GradeController extends Controller
         
         // Get request parameters        
         $qryParams = Yii::$app->request->queryParams;
-        
-        // Check parameters if request came from requirements page
-        // There are two parameters if from req'ts page, otherwise, just 1
-        if(count($qryParams) > 1 && array_key_exists('id', $qryParams)){
-            $query = $isAdmin ?
-                $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id']]]) :
-                $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id'], 'student_no' => Yii::$app->User->identity->student_no]]);
-            $req = $model->findRequirement($qryParams['id']);
-            $from_req_page = true;   
-        } else {
-            $query = $isAdmin ? $searchModel->search($qryParams) :
-                $searchModel->search(['GradeSearch' => ['student_no' => Yii::$app->User->identity->student_no]]);;
+
+        if(!$isGuest) {
+                
+                // Check parameters if request came from requirements page
+                // There are two parameters if from req'ts page, otherwise, just 1
+                if(count($qryParams) > 1 && array_key_exists('id', $qryParams)){
+                    $query = $isAdmin ?
+                        $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id']]]) :
+                        $searchModel->search(['GradeSearch' => ['requirement_id' => $qryParams['id'], 'student_no' => Yii::$app->User->identity->student_no]]);
+                    $req = $model->findRequirement($qryParams['id']);
+                    $from_req_page = true;   
+                } else {
+                    $query = $isAdmin ? $searchModel->search($qryParams) :
+                        $searchModel->search(['GradeSearch' => ['student_no' => Yii::$app->User->identity->student_no]]);;
+                }
+
         }
-            
+
         $dataProvider = $query;
         
         // validate if there is a editable input saved via AJAX
@@ -99,13 +103,14 @@ class GradeController extends Controller
                 
                 $out = Json::encode(['output'=>$output, 'message'=>'']);
             }
-            
             // return ajax json encoded response and exit
             echo $out;
             return;
         }
 
         return $this->render('index', [
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin,            
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'from_req_page' => $from_req_page,
@@ -121,8 +126,14 @@ class GradeController extends Controller
      */
     public function actionView($requirement_id, $student_no)
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         return $this->render('view', [
             'model' => $this->findModel($requirement_id, $student_no),
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin,  
         ]);
     }
 
@@ -133,6 +144,10 @@ class GradeController extends Controller
      */
     public function actionCreate()
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $model = new Grade();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -140,6 +155,8 @@ class GradeController extends Controller
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'isGuest' => $isGuest,
+                'isAdmin' => $isAdmin,  
             ]);
         }
     }
@@ -153,6 +170,10 @@ class GradeController extends Controller
      */
     public function actionUpdate($requirement_id, $student_no)
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $model = $this->findModel($requirement_id, $student_no);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -160,6 +181,8 @@ class GradeController extends Controller
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'isGuest' => $isGuest,
+                'isAdmin' => $isAdmin,                  
             ]);
         }
     }
@@ -173,9 +196,16 @@ class GradeController extends Controller
      */
     public function actionDelete($requirement_id, $student_no)
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $this->findModel($requirement_id, $student_no)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect('index', [
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin,   
+        ]);
     }
 
     /**

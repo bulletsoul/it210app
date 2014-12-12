@@ -1,21 +1,23 @@
 <?php
 
 use yii\helpers\Html;
-
+use yii\web\ForbiddenHttpException;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Grade */
 
-$this->title = 'Create Grade';
-$this->params['breadcrumbs'][] = ['label' => 'Grades', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
-?>
-<div class="grade-create">
+if($isAdmin){
+	$this->title = 'Create Grade';
+	$this->params['breadcrumbs'][] = ['label' => 'Grades', 'url' => ['index']];
+	$this->params['breadcrumbs'][] = $this->title;
+	?>
+	<div class="grade-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+	    <h1><?= Html::encode($this->title) ?></h1>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+	    <?= $this->render('_form', [
+	        'model' => $model,
+	    ]) ?>
 
-</div>
+	</div>
+<?php } else throw new ForbiddenHttpException('You are not allowed to access this page.'); ?>

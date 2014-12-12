@@ -7,7 +7,7 @@ use yii\web\ForbiddenHttpException;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-if(!$isGuest || $isAdmin){
+if($isAdmin){
     $this->title = 'Users';
     $this->params['breadcrumbs'][] = $this->title;
     ?>

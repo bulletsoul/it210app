@@ -53,8 +53,13 @@ class CategoryController extends Controller
      */
     public function actionView($id)
     {
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin
         ]);
     }
 
@@ -65,6 +70,9 @@ class CategoryController extends Controller
      */
     public function actionCreate()
     {
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $model = new Category();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -72,6 +80,8 @@ class CategoryController extends Controller
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'isGuest' => $isGuest,
+                'isAdmin' => $isAdmin
             ]);
         }
     }
@@ -84,6 +94,9 @@ class CategoryController extends Controller
      */
     public function actionUpdate($id)
     {
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -91,6 +104,8 @@ class CategoryController extends Controller
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'isGuest' => $isGuest,
+                'isAdmin' => $isAdmin
             ]);
         }
     }
@@ -103,9 +118,16 @@ class CategoryController extends Controller
      */
     public function actionDelete($id)
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect('index', [
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin
+        ]);
     }
 
     /**

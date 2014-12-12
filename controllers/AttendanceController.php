@@ -32,12 +32,18 @@ class AttendanceController extends Controller
      */
     public function actionIndex()
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $dataProvider = new ActiveDataProvider([
             'query' => Attendance::find(),
         ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin
         ]);
     }
 
@@ -49,8 +55,14 @@ class AttendanceController extends Controller
      */
     public function actionView($student_no, $date)
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         return $this->render('view', [
             'model' => $this->findModel($student_no, $date),
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin
         ]);
     }
 
@@ -61,6 +73,10 @@ class AttendanceController extends Controller
      */
     public function actionCreate()
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $model = new Attendance();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -68,6 +84,8 @@ class AttendanceController extends Controller
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'isGuest' => $isGuest,
+                'isAdmin' => $isAdmin
             ]);
         }
     }
@@ -81,6 +99,10 @@ class AttendanceController extends Controller
      */
     public function actionUpdate($student_no, $date)
     {
+
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $model = $this->findModel($student_no, $date);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -88,6 +110,8 @@ class AttendanceController extends Controller
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'isGuest' => $isGuest,
+                'isAdmin' => $isAdmin
             ]);
         }
     }
@@ -101,9 +125,15 @@ class AttendanceController extends Controller
      */
     public function actionDelete($student_no, $date)
     {
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         $this->findModel($student_no, $date)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect('index', [
+            'isGuest' => $isGuest,
+            'isAdmin' => $isAdmin
+        ]);
     }
 
     /**

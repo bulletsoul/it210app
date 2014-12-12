@@ -1,14 +1,12 @@
 <?php
 
 use yii\helpers\Html;
+use yii\web\ForbiddenHttpException;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 
-$isGuest = Yii::$app->User->isGuest;
-$isAdmin = ((!$isGuest)&&(Yii::$app->User->identity->user_type == 0));
-
-if(!$isGuest || $isAdmin){
+if(!$isGuest){
     $this->title = 'Update User: ' . ' ' . $model->user_id;
     $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
     $this->params['breadcrumbs'][] = ['label' => $model->student_no, 'url' => ['view', 'id' => $model->user_id]];

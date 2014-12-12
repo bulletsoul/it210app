@@ -6,10 +6,10 @@ use yii\web\ForbiddenHttpException;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-if(!$isGuest || $isAdmin){
+if(!$isGuest){
     $this->title = 'Categories';
     $this->params['breadcrumbs'][] = $this->title;
-?>
+    ?>
     <div class="category-index">
     
         <h1><?= Html::encode($this->title) ?></h1>
