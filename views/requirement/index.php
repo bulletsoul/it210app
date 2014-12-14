@@ -17,10 +17,11 @@ if(!$isGuest || $isAdmin){
     
         <h1><?= Html::encode($this->title) ?></h1>
     
+        <?php if ($isAdmin) {?>
         <p>
             <?= Html::a('Create Requirement', ['create'], ['class' => 'btn btn-success']) ?>
         </p>
-    
+        <?php }; ?>
        
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
@@ -45,7 +46,10 @@ if(!$isGuest || $isAdmin){
                     return $val;
                  }
                 ],
-                ['class' => 'yii\grid\ActionColumn'],
+                [
+                // if ($isAdmin) 
+                    'class' => 'yii\grid\ActionColumn'
+                ],
             ],
         ]); ?>
     
