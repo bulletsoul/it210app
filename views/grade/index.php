@@ -12,9 +12,7 @@ use yii\web\ForbiddenHttpException;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 if(!$isGuest){
 
-    if (!$isAdmin) {
         ///////////////////////////////////
-
         // get requirement IDs in a category
         function getRequirementIDs( $categoryID ){
 
@@ -30,8 +28,24 @@ if(!$isGuest){
 
         };
 
-        // get average of the same category
-        function getAverageSameCategory($categoryID, $dataP){
+        //get grade with student_no and requirement_id
+        function getGrade( $reqid, $studno ){
+            $grade = (new \yii\db\Query())
+                ->select('grade')
+                ->from('grade')
+                ->where([
+                    'requirement_id' => $reqid,
+                    'student_no' => $studno,
+                ])
+                ->one();
+
+               $grad = implode("",$grade);
+               // print "| grade = $grad |";
+               return $grad;
+        }
+
+        // Student get average of the same category 
+        function getAverageSameCategory_student($categoryID, $dataP){
 
             $requirements = getRequirementIDs( $categoryID );
 
@@ -46,6 +60,28 @@ if(!$isGuest){
             // print "$total = ";
             // print "$count = ";
             // print "$average ";
+
+            return $average;
+        };
+
+       // Admin get average of the same category
+        function getAverageSameCategory_admin($categoryID, $stud_no){
+
+            $requirements = getRequirementIDs( $categoryID );
+
+            $count = 0;
+            $total = 0;
+            foreach ( $requirements as $req ){
+                $count = $count + 1;
+                $reqid = ((int)implode("",$req));
+                $grad = (int)getGrade($reqid, $stud_no);
+                // print "| grade = $grad |";
+                $total = $total + $grad;
+            }
+            $average = $total / $count; 
+            // print "| total = $total |";
+            // print "| count = $count |";
+            // print "| average = $average |";
 
             return $average;
         };
@@ -66,9 +102,10 @@ if(!$isGuest){
         };
 
         // get average * percentage in category
-        function getPartTotal($catID,$dataP_){
+        function getPartTotal($catID, $data, $profOrStud){
             $percent = getPercentageOfCategory($catID);
-            $average = getAverageSameCategory($catID,$dataP_);
+            $profOrStud ? $average = getAverageSameCategory_student($catID, $data) :
+                $average = getAverageSameCategory_admin($catID, $data);
             $gradeInCategory = ($percent / 100) * $average;
 
             // print "| percent = $percent | ";
@@ -78,7 +115,7 @@ if(!$isGuest){
             return $gradeInCategory;
         };
 
-        // get each category IDs & get total average
+        function getTotalAverage($stud_no){
             $categories = (new \yii\db\Query())
                 ->select('category_id')
                 ->from('category')
@@ -88,13 +125,51 @@ if(!$isGuest){
             foreach($categories as $cat){
                 $category = implode (" ",$cat);
                 // print "| $category |";
-                $fullTotalGrade = $fullTotalGrade + getPartTotal($cat,$dataProvider);
+                $fullTotalGrade = $fullTotalGrade + getPartTotal($cat,$stud_no,0);
             };
-            print "Total Grade = $fullTotalGrade %";
+            // print "Total Grade = $fullTotalGrade %";
+            return $fullTotalGrade;
+        };
 
+        if (!$isAdmin) {
+
+            // get each category IDs & get total average
+                $categories = (new \yii\db\Query())
+                    ->select('category_id')
+                    ->from('category')
+                    ->all();
+
+                $fullTotalGrade = 0;
+                foreach($categories as $cat){
+                    $category = implode (" ",$cat);
+                    // print "| $category |";
+                    $fullTotalGrade = $fullTotalGrade + getPartTotal($cat,$dataProvider,1);
+                };
+                print "Total Grade = $fullTotalGrade %";
+        }
+        else{
+
+            // get Average per Student No.
+            // SELECT `student_no` FROM `user` WHERE `user_type` = 1;
+            $users = (new \yii\db\Query())
+                ->select('student_no')
+                ->from('user')
+                ->where([
+                    'user_type' => '1',
+                ])
+                ->all();
+                // ->one();
+            // print implode(" ",$users); 
+
+            foreach($users as $stud_no){
+                $totalAverage = getTotalAverage($stud_no);
+                $studn = implode(" ",$stud_no);
+                print nl2br("Student No: $studn | Average: $totalAverage \n");
+            };
+        };
         ///////////////////////////////////
-    };
-    
+
+
     $this->title = $from_req_page ? 'Grades for '.$req->title.'('.$req->perfect_grade.')' : 'Grades';
 
     $this->params['breadcrumbs'][] = $this->title;

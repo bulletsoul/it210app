@@ -116,9 +116,7 @@ if($isAdmin){
             if ($stud_no->user_type == '1'){
                 $totalAverage = getTotalAverage($stud_no->student_no);
                 $studno = $stud_no->student_no;
-                print "| Student No: $studno |";
-                print "| Average: $totalAverage |";
-
+                print nl2br("Student No: $studno | Average: $totalAverage \n");
             }
         };
 
