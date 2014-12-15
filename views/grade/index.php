@@ -38,10 +38,11 @@ if(!$isGuest){
                     'student_no' => $studno,
                 ])
                 ->one();
-
+                if($grade!=NULL){
                $grad = implode("",$grade);
                // print "| grade = $grad |";
                return $grad;
+           }
         }
 
         // Student get average of the same category 
@@ -152,20 +153,62 @@ if(!$isGuest){
             // get Average per Student No.
             // SELECT `student_no` FROM `user` WHERE `user_type` = 1;
             $users = (new \yii\db\Query())
-                ->select('student_no')
+                ->select('student_no')//, lname, fname')
                 ->from('user')
                 ->where([
                     'user_type' => '1',
                 ])
                 ->all();
                 // ->one();
-            // print implode(" ",$users); 
+            // print_r($users); 
 
-            foreach($users as $stud_no){
-                $totalAverage = getTotalAverage($stud_no);
-                $studn = implode(" ",$stud_no);
-                print nl2br("Student No: $studn | Average: $totalAverage \n");
-            };
+
+            
+            ?> 
+
+            <h1>Summary of Grades</h1>
+                <table border=1 width="100%" bordercolor="f1f1f1">
+                            <th><font color="428bca">Student No.</font></th>
+                            <th><font color="428bca">Average Grade</font></th>
+                        
+                            <?php
+                            $i = 0;
+                            foreach($users as $stud_no) {
+                                $i++;
+                                $totalAverage = getTotalAverage($stud_no);
+                                $studn = implode(" ",$stud_no);
+                                if($i%2==0){
+                                ?>
+                                <tr bgcolor="#F9f9f9">
+                                    <td>
+                                        <?php print nl2br($studn); ?> 
+
+                                    </td>
+                                    <td>
+                                         <?php print nl2br($totalAverage); ?>
+                                    </td>
+                                </tr>
+                                <?php
+                                }else{
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <?php print nl2br($studn); ?> 
+
+                                        </td>
+                                        <td>
+                                             <?php print nl2br($totalAverage); ?>
+                                        </td>
+                                    </tr>       
+
+                                <?php
+                            };
+                                };
+                            ?>
+                        
+                    
+                </table>
+        <?php
         };
         ///////////////////////////////////
 

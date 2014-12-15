@@ -114,7 +114,7 @@ class GradeController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'from_req_page' => $from_req_page,
-            'req' => $req
+            'req' => $req,
         ]);
     }
 

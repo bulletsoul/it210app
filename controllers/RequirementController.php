@@ -62,6 +62,9 @@ class RequirementController extends Controller
      */
     public function actionView($id)
     {
+        $isGuest = Yii::$app->user->isGuest;
+        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
+
         return $this->render('view', [
             'model' => $this->findModel($id),
             'isGuest' => $isGuest,
