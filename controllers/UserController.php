@@ -8,6 +8,8 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\db\Query;
+use yii\db\QueryBuilder;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -30,6 +32,52 @@ class UserController extends Controller
      * Lists all User models.
      * @return mixed
      */
+	 
+	public function actionCheckatt(){
+	
+		$query = new Query;
+        $query->select('lname, fname, att_no')
+            ->from('user')
+            ->where('user_type=1');
+          // 	->OrderBy('lname');
+        
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+        
+			$queryBuilder= new QueryBuilder($query);
+			//	$params = [];
+			//	$sql = $queryBuilder->update('user', ['att_no' => 1], 'user_id = 10', $params);
+							
+    		$students=User::find()
+            ->where(['user_type'=>1])
+          //  ->orderBy('lname')
+            ->all();
+            
+        if(isset($_GET['keylist'])){
+        	$d=$_GET['keylist'];
+        	$token = strtok($d, ",");
+        	$ctr=0;
+        	
+        	foreach ($students as $student){        
+        		
+        	  if($token==$ctr){
+        	  	//$student->att_no=5;
+        	  	//$students->save();
+        	  	$token = strtok(",");
+        	  }
+        		echo $student->att_no;
+        		$ctr++; 
+        	}
+        return "Data updated";
+    }
+	else{
+		error_log('here...');
+        return $this->render('checkatt', [
+            'dataProvider' => $dataProvider,
+        ]);   
+    }
+	}
     public function actionIndex()
     {
         $isGuest = Yii::$app->user->isGuest;

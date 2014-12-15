@@ -41,6 +41,7 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Home', 'url' => ['/site/index']],
                     $isAdmin ? ['label' => 'Create User', 'url' => ['/user/create']] : '',
+					$isAdmin ? ['label' => 'Check Attendance', 'url' => ['/user/checkatt']] : '',
                     !$isGuest ? ['label' => 'View Categories', 'url' => ['/category/index']] : '',
                     !$isGuest ? ['label' => 'View Requirements', 'url' => ['/requirement/index']] : '',
                     !$isGuest ? ['label' => 'View Grades', 'url' => ['/grade/index']] : '',
