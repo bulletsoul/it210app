@@ -17,16 +17,30 @@ if(!$isGuest){
         function getRequirementIDs( $categoryID ){
 
             $requirements = (new \yii\db\Query())
-                ->select('requirement_id')
+                ->select('requirement_id,perfect_grade')
                 ->from('requirement')
                 ->where([
                     'category_id' => $categoryID,
                 ])
                 ->all();
 
+            // print_r($requirements);
+
+            // foreach ($requirements as $reqid){
+            //     foreach ($reqid as $key => $value) {
+            //         if ($key == "requirement_id"){
+            //             print ("requirement_id : $value ");
+            //         } else {
+            //             print nl2br("perfect_grade: $value\n");
+            //         };
+            //         // print nl2br("Key: $key; Value: $value\n");
+            //     }
+            // }    
             return $requirements;
 
         };
+
+        // getRequirementIDs('3');
 
         //get grade with student_no and requirement_id
         function getGrade( $reqid, $studno ){
@@ -47,19 +61,25 @@ if(!$isGuest){
 
         // Student get average of the same category 
         function getAverageSameCategory_student($categoryID, $dataP){
-
+            
             $requirements = getRequirementIDs( $categoryID );
 
-            $count = 0;
+            $perfect_total = 0;
             $total = 0;
-            foreach ( $requirements as $req ){
-                $count = $count + 1;
-                $reqid = ((int)implode("",$req)) - 1;
-                $total = $total + $dataP->models[$reqid]->grade;
+            foreach ($requirements as $r){
+                foreach ( $r as $key => $value ){
+                    if ($key == "requirement_id"){
+                        $reqid = ((int)implode("",$value)) - 1;
+                        $total = $total + $dataP->models[$reqid]->grade;
+                    } else {
+                        $p_grade = ((int)implode("",$value));
+                        $perfect_total = $perfect_total + $p_grade;
+                    }
+                }
             }
-            $average = $total / $count; 
+            $average = $total / $perfect_total; 
             // print "$total = ";
-            // print "$count = ";
+            // print "$perfect_total = ";
             // print "$average ";
 
             return $average;
@@ -70,18 +90,29 @@ if(!$isGuest){
 
             $requirements = getRequirementIDs( $categoryID );
 
-            $count = 0;
+            $perfect_total = 0;
             $total = 0;
-            foreach ( $requirements as $req ){
-                $count = $count + 1;
-                $reqid = ((int)implode("",$req));
-                $grad = (int)getGrade($reqid, $stud_no);
-                // print "| grade = $grad |";
-                $total = $total + $grad;
+            foreach ( $requirements as $r){
+                foreach ( $r as $key => $value ){
+                    if ($key == 'requirement_id'){
+                        $reqid = ((int)$value);
+                        $grad = (int)getGrade($reqid, $stud_no);
+                        $total = $total + $grad;
+                        // print nl2br("reqid = $reqid\n");
+                        // print nl2br("grade = $grad\n");
+                    } else {
+                        $p_grade = ((int)$value);
+                        $perfect_total = $perfect_total + $p_grade;
+                        // print nl2br("perfect grade = $p_grade\n");
+                    }
+                    // print "| grade = $grad |";
+
+                }
             }
-            $average = $total / $count; 
+            $ave = $total / $perfect_total; 
+            $average = $ave * 100;
             // print "| total = $total |";
-            // print "| count = $count |";
+            // print "| perfect_total = $perfect_total |";
             // print "| average = $average |";
 
             return $average;
@@ -146,7 +177,7 @@ if(!$isGuest){
                     // print "| $category |";
                     $fullTotalGrade = $fullTotalGrade + getPartTotal($cat,$dataProvider,1);
                 };
-                print "Total Grade = $fullTotalGrade %";
+                // print "Total Grade = $fullTotalGrade %";
         }
         else{
 
@@ -166,7 +197,7 @@ if(!$isGuest){
             
             ?> 
 
-            <h1>Summary of Grades</h1>
+             <h1>Summary of Grades</h1>
                 <table border=1 width="100%" bordercolor="f1f1f1">
                             <th><font color="428bca">Student No.</font></th>
                             <th><font color="428bca">Average Grade</font></th>
@@ -181,11 +212,11 @@ if(!$isGuest){
                                 ?>
                                 <tr bgcolor="#F9f9f9">
                                     <td>
-                                        <?php print nl2br($studn); ?> 
+                                         <?php print nl2br($studn); ?> 
 
                                     </td>
                                     <td>
-                                         <?php print nl2br($totalAverage); ?>
+                                          <?php print nl2br($totalAverage); ?>
                                     </td>
                                 </tr>
                                 <?php
@@ -193,7 +224,7 @@ if(!$isGuest){
                                     ?>
                                     <tr>
                                         <td>
-                                            <?php print nl2br($studn); ?> 
+                                             <?php print nl2br($studn); ?> 
 
                                         </td>
                                         <td>
@@ -207,7 +238,7 @@ if(!$isGuest){
                             ?>
                         
                     
-                </table>
+                </table> 
         <?php
         };
         ///////////////////////////////////
