@@ -25,6 +25,8 @@ use app\models\Category;
 
     <?= $form->field($model, 'description')->textInput(['maxlength' => 800]) ?>   
 
+    <?= $form->field($model, 'perfect_grade')->textInput(['maxlength' => 10]) ?>
+
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>

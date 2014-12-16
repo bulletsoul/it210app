@@ -46,7 +46,6 @@ AppAsset::register($this);
                     !$isGuest ? ['label' => 'View Requirements', 'url' => ['/requirement/index']] : '',
                     !$isGuest ? ['label' => 'View Grades', 'url' => ['/grade/index']] : '',
                     // !$isGuest ? ['label' => 'Summary of Grades', 'url' => ['/grade/index']] : '',
-                    !$isGuest ? ['label' => 'View Attendance', 'url' => ['/attendance/index']] : '',
                     
                     $isGuest ?
                         ['label' => 'Login', 'url' => ['/site/login']] :

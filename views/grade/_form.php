@@ -23,7 +23,7 @@ use app\models\User;
     </div>
 
     <div class="form-group">        
-    <label for="user">Student Last Name</label>
+    <label for="user">Student Name</label>
     <?= Html::activeDropDownList($model, 'student_no',
                 ArrayHelper::map(User::find()->all(), 'student_no', 'lname','fname'),
                 ['id' => 'student_no', 'class' => 'form-control']) ?>

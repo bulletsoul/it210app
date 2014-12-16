@@ -31,6 +31,15 @@ class GradeController extends Controller
      * Lists all Grade models.
      * @return mixed
      */
+	 
+	public function actionSummary($dataProvider, $isGuest, $isAdmin){
+	
+        return $this->render('summary',[
+			'isGuest' => $isGuest,
+			'dataProvider' => $dataProvider,
+			'isAdmin' => $isAdmin
+		]);
+	}
     public function actionIndex()
     {
         // Variables

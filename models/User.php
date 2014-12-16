@@ -42,7 +42,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             [['student_no'], 'string', 'max' => 10],
             [['username', 'lname', 'fname'], 'string', 'max' => 30],
             [['password'], 'string', 'max' => 800],
-            [['student_no'], 'unique']
+			
+            [['student_no'], 'unique'],
+			
         ];
     }
 

@@ -46,9 +46,18 @@ if(!$isGuest || $isAdmin){
                     return $val;
                  }
                 ],
+                // [
+                //  'attribute' => 'perfect_grade',
+                //  'value' => function ($model) {
+                //     $val = $model->findRequirement($model->perfect_grade)->description;
+                //     return $val;
+                //  }
+                // ],
+                'perfect_grade',
                 [
                 // if ($isAdmin) 
-                    'class' => 'yii\grid\ActionColumn'
+                    'class' => 'yii\grid\ActionColumn',
+					'visible' => $isAdmin
                 ],
             ],
         ]); ?>

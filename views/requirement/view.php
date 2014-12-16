@@ -29,10 +29,11 @@ if($isAdmin){
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
-                'requirement_id',
+                // 'requirement_id',
                 'description',
                 'title',
                 'category_id',
+                'perfect_grade',
             ],
         ]) ?>
 

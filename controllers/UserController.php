@@ -32,10 +32,30 @@ class UserController extends Controller
      * Lists all User models.
      * @return mixed
      */
-	 
-	public function actionCheckatt(){
-	
-		$query = new Query;
+	 public function actionUpattotal(){
+				$teacher=User::find()
+            ->where(['user_type'=>0])
+            ->one();
+		
+				 if(isset($_GET['attValue'])){
+				 	//setting the $connection variable to support the non sql commands
+        	$connection = new \yii\db\Connection([
+    				'dsn' => 'mysql:host=localhost;dbname=it210app',
+    				'username' => 'root',
+    				'password' => '',
+					]);
+						$connection->open();
+						$newAttvalue=$_GET['attValue'];
+						
+				 		$connection->createCommand()->update('user', ['att_no' => $newAttvalue], 'user_type=0')->execute();
+				 		return "mau".$newAttvalue;
+				 		}
+				 		
+				return $this->render('upattotal', [
+            'teacher' => $teacher,
+        ]);
+		}
+	public function actionCheckatt(){$query = new Query;
         $query->select('lname, fname, att_no')
             ->from('user')
             ->where('user_type=1');
@@ -44,62 +64,56 @@ class UserController extends Controller
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-        
-			$queryBuilder= new QueryBuilder($query);
-			//	$params = [];
-			//	$sql = $queryBuilder->update('user', ['att_no' => 1], 'user_id = 10', $params);
 							
     		$students=User::find()
             ->where(['user_type'=>1])
           //  ->orderBy('lname')
             ->all();
+        
+        $teacher=User::find()
+            ->where(['user_type'=>0])
+          //  ->orderBy('lname')
+            ->one();
             
         if(isset($_GET['keylist'])){
-        	$d=$_GET['keylist'];
+        	//setting the $connection variable to support the non sql commands
+        	$connection = new \yii\db\Connection([
+    				'dsn' => 'mysql:host=localhost;dbname=it210app',
+    				'username' => 'root',
+    				'password' => '',
+					]);
+					$connection->open();
+         
+					$d=$_GET['keylist'];
         	$token = strtok($d, ",");
         	$ctr=0;
         	
         	foreach ($students as $student){        
-        		
+        		$currAtt=	$student->att_no;
+ 	        	$studNum = $student->student_no;
         	  if($token==$ctr){
-        	  	//$student->att_no=5;
-        	  	//$students->save();
+       	    		$cur=$currAtt + 1;
+        	 		 	$connection->createCommand()->update('user', ['att_no' => $cur], ['student_no'=>$studNum])->execute();
         	  	$token = strtok(",");
         	  }
-        		echo $student->att_no;
+        		 
         		$ctr++; 
-        	}
-        return "Data updated";
-    }
-	else{
-		error_log('here...');
-        return $this->render('checkatt', [
-            'dataProvider' => $dataProvider,
-        ]);   
-    }
-	}
-    public function actionIndex()
-    {
-        $isGuest = Yii::$app->user->isGuest;
-        $isAdmin = ((!$isGuest)&&(Yii::$app->user->identity->user_type == 0));
-        $query = '';
+        	}        		
+ 
+    		}
+     		$query = new Query;
+        $query->select('lname, fname, att_no')
+            ->from('user')
+            ->where('user_type=1');
         
-        if(!$isGuest){
-            $query = $isAdmin ?
-                User::find()://->where(['user_type' => 1]) :
-                User::find()->where(['user_id' => Yii::$app->User->identity->user_id]);
-        }        
-        
-        // Return students only
         $dataProvider = new ActiveDataProvider([
-            'query' => $query
+            'query' => $query,
         ]);
 
-        return $this->render('index', [
+        return $this->render('checkatt', [
             'dataProvider' => $dataProvider,
-            'isGuest' => $isGuest,
-            'isAdmin' => $isAdmin
-        ]);
+            'teacher' => $teacher,
+        ]);   
     }
 
     /**

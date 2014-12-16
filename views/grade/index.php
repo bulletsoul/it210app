@@ -7,6 +7,7 @@ use kartik\grid\EditableColumn;
 use yii\bootstrap\BootstrapAsset;
 use yii\web\ForbiddenHttpException;
 
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\GradeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -69,10 +70,10 @@ if(!$isGuest){
             foreach ($requirements as $r){
                 foreach ( $r as $key => $value ){
                     if ($key == "requirement_id"){
-                        $reqid = ((int)implode("",$value)) - 1;
+                        $reqid = $value - 1;
                         $total = $total + $dataP->models[$reqid]->grade;
                     } else {
-                        $p_grade = ((int)implode("",$value));
+                        $p_grade = $value;
                         $perfect_total = $perfect_total + $p_grade;
                     }
                 }
@@ -163,7 +164,7 @@ if(!$isGuest){
             return $fullTotalGrade;
         };
 
-        if (!$isAdmin) {
+        if (!$isAdmin && !$from_req_page) {
 
             // get each category IDs & get total average
                 $categories = (new \yii\db\Query())
@@ -177,14 +178,17 @@ if(!$isGuest){
                     // print "| $category |";
                     $fullTotalGrade = $fullTotalGrade + getPartTotal($cat,$dataProvider,1);
                 };
-                // print "Total Grade = $fullTotalGrade %";
+				$fTotalGrade = $fullTotalGrade*100;
+				?>
+				<span class="label label-warning">Current Standing:</span><?= $fTotalGrade ?>%
+				<?php
         }
         else{
 
             // get Average per Student No.
             // SELECT `student_no` FROM `user` WHERE `user_type` = 1;
             $users = (new \yii\db\Query())
-                ->select('student_no')//, lname, fname')
+                ->select('student_no, lname, fname')
                 ->from('user')
                 ->where([
                     'user_type' => '1',
@@ -192,59 +196,36 @@ if(!$isGuest){
                 ->all();
                 // ->one();
             // print_r($users); 
-
-
-            
+           
             ?> 
 
-             <h1>Summary of Grades</h1>
-                <table border=1 width="100%" bordercolor="f1f1f1">
-                            <th><font color="428bca">Student No.</font></th>
-                            <th><font color="428bca">Average Grade</font></th>
-                        
-                            <?php
-                            $i = 0;
-                            foreach($users as $stud_no) {
-                                $i++;
-                                $totalAverage = getTotalAverage($stud_no);
-                                $studn = implode(" ",$stud_no);
-                                if($i%2==0){
-                                ?>
-                                <tr bgcolor="#F9f9f9">
-                                    <td>
-                                         <?php print nl2br($studn); ?> 
+            <?php
+            // foreach ( $users as $u){
+            //     foreach ( $u as $key => $value ){
+            //         if ($key == 'student_no'){
+            //             $stud_no = $value;
+            //             print nl2br("\nStudent No: $stud_no");
+            //         } else if ($key == 'lname') {
+            //             $lastname = $value;
+            //             print nl2br("\nLast Name: $lastname");
+            //         } else if ($key == 'fname') {
+            //             $firstname = $value;
+            //             print nl2br("\nFirst Name: $firstname");
+            //         };
+            //     };
+            //     print nl2br("\nStudent No: $stud_no | Last Name: $lastname | First Name: $firstname");                
+            // }
+            ?>
 
-                                    </td>
-                                    <td>
-                                          <?php print nl2br($totalAverage); ?>
-                                    </td>
-                                </tr>
-                                <?php
-                                }else{
-                                    ?>
-                                    <tr>
-                                        <td>
-                                             <?php print nl2br($studn); ?> 
-
-                                        </td>
-                                        <td>
-                                             <?php print nl2br($totalAverage); ?>
-                                        </td>
-                                    </tr>       
-
-                                <?php
-                            };
-                                };
-                            ?>
-                        
-                    
-                </table> 
+             
+			  <?= Html::a('View Summary of Grades', ['summary', 'dataProvider' => serialize($dataProvider), 'isGuest' => $isGuest, 'isAdmin' => $isAdmin], ['class' => 'btn btn-info']) ?>
+               
         <?php
         };
         ///////////////////////////////////
 
 
-    $this->title = $from_req_page ? 'Grades for '.$req->title.'('.$req->perfect_grade.')' : 'Grades';
+    $this->title = $from_req_page ? 'Grades for '.$req->title.' ('.$req->perfect_grade.'/'.$req->perfect_grade.')' : 'Grades';
 
     $this->params['breadcrumbs'][] = $this->title;
     ?>
@@ -260,7 +241,7 @@ if(!$isGuest){
         <?php }; ?>
         
         <?php
-            $grade_column = !$from_req_page ? 'grade' :
+            $grade_column = ((!$from_req_page && $isAdmin) || (!$isGuest && !$isAdmin)) ? 'grade' :
                 [
                     'class' => 'kartik\grid\EditableColumn',
                     'attribute'=>'grade', 
@@ -279,7 +260,16 @@ if(!$isGuest){
                 ];
             
             $gridColumns = [
-                $grade_column,
+
+                'student_no',
+                [
+                    'attribute' => 'student_name',
+                    'value' => function ($model) {
+                        $val = $model->findStudentName($model->student_no);
+                        return $val->lname.', '.$val->fname;
+                    },
+                    'enableSorting' => true
+                ],
                 //'requirement_id',
                 [
                     'attribute' => 'requirement',
@@ -290,16 +280,7 @@ if(!$isGuest){
                     'value' => 'requirement.title',
                     'enableSorting' => true
                 ],
-                'student_no',
-                [
-                    'attribute' => 'student_name',
-                    'value' => function ($model) {
-                        $val = $model->findStudentName($model->student_no);
-                        return $val->lname.', '.$val->fname;
-                    },
-                    'enableSorting' => true
-                ],
-
+                $grade_column,
             ];
         // end of grid columns definition
         ?>
@@ -319,7 +300,8 @@ if(!$isGuest){
         ]); ?>
 
     </div>
+
+
 <?php } else throw new ForbiddenHttpException('You are not allowed to access this page.'); ?>
 
-<?php
 
