@@ -22,9 +22,12 @@ use app\models\User;
                 ['id' => 'requirement_id', 'class' => 'form-control']) ?>
     </div>
 
-    <?= $form->field($model, 'student_no')->textInput(['maxlength' => 10]) ?>
-
-    <?= $form->field($model, 'student_no')->textInput(['maxlength' => 10]) ?>
+    <div class="form-group">        
+    <label for="user">Student Last Name</label>
+    <?= Html::activeDropDownList($model, 'student_no',
+                ArrayHelper::map(User::find()->all(), 'student_no', 'lname','fname'),
+                ['id' => 'student_no', 'class' => 'form-control']) ?>
+    </div>
 
     <?= $form->field($model, 'grade')->textInput() ?>
 
